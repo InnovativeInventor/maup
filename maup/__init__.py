@@ -6,7 +6,7 @@ from .repair import close_gaps, resolve_overlaps, make_valid, autorepair, snap_t
 from .normalize import normalize
 from .progress_bar import progress
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __all__ = [
     "assign",
     "intersections",

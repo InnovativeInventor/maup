@@ -116,21 +116,21 @@ def autorepair(geometries, relative_threshold=0.1):
     basis. Set `relative_threshold=None` to attempt to resolve all overlaps. See
     `resolve_overlaps()` and `close_gaps()` for more.
     """
-    shp = geometries.copy()
+    geometries = get_geometries(geometries.copy())
 
-    shp["geometry"] = make_valid(shp)
-    shp["geometry"] = remove_repeated_vertices(shp)
-    shp["geometry"] = resolve_overlaps(shp, relative_threshold=relative_threshold)
-    shp["geometry"] = close_gaps(shp, relative_threshold=relative_threshold)
+    geometries = make_valid(geometries)
+    geometries = remove_repeated_vertices(geometries)
+    geometries = resolve_overlaps(geometries, relative_threshold=relative_threshold)
+    geometries = close_gaps(geometries, relative_threshold=relative_threshold)
 
-    return shp["geometry"]
+    return geometries 
 
 def make_valid(geometries):
     """
     Applies the shapely .buffer(0) and make_valid (once released) trick to all
     geometries. Should help resolve various topological issues in shapefiles.
     """
-    return geometries["geometry"].simplify(0).buffer(0)
+    return get_geometries(geometries).simplify(0).buffer(0)
     # return geometries["geometry"].buffer(0).apply(lambda x: make_valid(x))
 
 def remove_repeated_vertices(geometries):
@@ -138,7 +138,7 @@ def remove_repeated_vertices(geometries):
     Removes repeated vertices. Vertices are considered to be repeated if they
     appear consecutively, excluding the start and end points.
     """
-    return geometries["geometry"].apply(lambda x: apply_func_to_polygon_parts(x, dedup_vertices))
+    return get_geometries(geometries).apply(lambda x: apply_func_to_polygon_parts(x, dedup_vertices))
 
 def snap_to_grid(geometries, n=-7):
     """
@@ -146,7 +146,7 @@ def snap_to_grid(geometries, n=-7):
     resolve floating point precision issues in shapefiles.
     """
     func = functools.partial(snap_polygon_to_grid, n=n)
-    return geometries["geometry"].apply(lambda x: apply_func_to_polygon_parts(x, func))
+    return get_geometries(geometries).apply(lambda x: apply_func_to_polygon_parts(x, func))
 
 def crop_to(source, target):
     """
@@ -203,7 +203,7 @@ def doctor(source, target=None):
 
     for shp in shapefiles:
         assert shp.is_valid.all(), "There are some invalid geometries!"
-        assert shp["geometry"].apply(lambda x: isinstance(x, (Polygon, MultiPolygon))).all(), "Some rows do not have geometries"
+        assert get_geometries(shp).apply(lambda x: isinstance(x, (Polygon, MultiPolygon))).all(), "Some rows do not have geometries"
 
         overlaps = count_overlaps(shp)
         holes = len(holes_of_union(shp))
@@ -217,7 +217,7 @@ def count_overlaps(shp):
     """
     Counts overlaps. Code is taken directly from the resolve_overlaps function in maup.
     """
-    inters = adjacencies(shp["geometry"], warn_for_islands=False, warn_for_overlaps=False)
+    inters = adjacencies(get_geometries(shp), warn_for_islands=False, warn_for_overlaps=False)
     overlaps = inters[inters.area > 0].buffer(0)
     return len(overlaps)
 

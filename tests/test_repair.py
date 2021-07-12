@@ -88,8 +88,8 @@ def test_crop_to_invariants():
 
     assert math.isclose(old_crop.area, new_crop.area)
     assert math.isclose(old_crop.symmetric_difference(new_crop).area, 0)
-    assert old_crop.area >= old_precincts.area
-    assert new_crop.area >= new_precincts.area
+    assert old_crop.area <= old_precincts.area
+    assert new_crop.area <= new_precincts.area
 
 def test_expand_to_invariants():
     old_precincts = geopandas.read_file("zip://./examples/precincts.zip")

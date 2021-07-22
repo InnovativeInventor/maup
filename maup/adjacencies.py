@@ -37,7 +37,12 @@ def adjacencies(
     if adjacency_type not in ["rook", "queen"]:
         raise ValueError('adjacency_type must be "rook" or "queen"')
 
-    index, geoms = zip(*iter_adjacencies(geometries))
+    adjs = iter_adjacencies(geometries)
+    if adjs:
+        index, geoms = zip(*adjs)
+    else: # maybe throw user warning
+        return GeoSeries([])
+
     inters = GeoSeries(geoms, index=index, crs=geometries.crs)
 
     if adjacency_type == "rook":

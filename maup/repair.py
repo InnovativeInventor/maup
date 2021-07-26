@@ -120,7 +120,9 @@ def autorepair(geometries, relative_threshold=0.1):
 
     geometries = make_valid(geometries)
     geometries = remove_repeated_vertices(geometries)
+    geometries = make_valid(geometries)
     geometries = resolve_overlaps(geometries, relative_threshold=relative_threshold)
+    geometries = make_valid(geometries)
     geometries = close_gaps(geometries, relative_threshold=relative_threshold)
 
     return geometries 

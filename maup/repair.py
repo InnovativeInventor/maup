@@ -118,12 +118,10 @@ def autorepair(geometries, relative_threshold=0.1):
     """
     shp = geometries.copy()
 
+    shp["geometry"] = make_valid(shp)
     shp["geometry"] = remove_repeated_vertices(shp)
-    shp["geometry"] = make_valid(shp)
     shp["geometry"] = resolve_overlaps(shp, relative_threshold=relative_threshold)
-    shp["geometry"] = make_valid(shp)
     shp["geometry"] = close_gaps(shp, relative_threshold=relative_threshold)
-    shp["geometry"] = make_valid(shp)
 
     return shp["geometry"]
 
